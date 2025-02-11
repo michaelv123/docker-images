@@ -10,3 +10,9 @@ ENV \
 	PKG_CONFIG_PATH="/opt/x-tools/$XTOOLS_HOST/$XTOOLS_HOST/sysroot/usr/lib/pkgconfig"
 COPY scripts/install-packages.sh /tmp
 RUN /tmp/install-packages.sh qemu-user
+
+# Do the actual build
+RUN git clone https://github.com/frida/frida /frida
+WORKDIR /frida
+RUN ./configure --host=arm-unknown-linux-gnueabi --without-prebuilds=sdk:host
+RUN make
