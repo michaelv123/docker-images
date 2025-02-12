@@ -14,5 +14,6 @@ RUN /tmp/install-packages.sh qemu-user
 # Do the actual build
 RUN git clone https://github.com/frida/frida /frida
 WORKDIR /frida
-RUN ./configure --host=arm-unknown-linux-gnueabi --without-prebuilds=sdk:host
+RUN ./configure --host=arm-unknown-linux-gnueabi --without-prebuilds=sdk:host --enable-frida-tools --enable-graft-tool --enable-gadget --enable-server --enable-portal --enable-inject --enable-frida-python -- -Dlibdir=lib -Dfrida_qml=disabled  -Dfrida-gum:devkits=gum,gumjs -Dfrida-core:devkits=core
 RUN make
+RUN make install
