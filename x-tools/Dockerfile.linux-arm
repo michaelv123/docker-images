@@ -11,9 +11,22 @@ ENV \
 COPY scripts/install-packages.sh /tmp
 RUN /tmp/install-packages.sh qemu-user
 
-# Do the actual build
+# Build frida
 RUN git clone https://github.com/frida/frida /frida
 WORKDIR /frida
+RUN git checkout 16.5.9
 RUN ./configure --host=arm-unknown-linux-gnueabi --without-prebuilds=sdk:host --enable-frida-tools --enable-graft-tool --enable-gadget --enable-server --enable-portal --enable-inject --enable-frida-python -- -Dlibdir=lib -Dfrida_qml=disabled  -Dfrida-gum:devkits=gum,gumjs -Dfrida-core:devkits=core
 RUN make
 RUN make install
+
+# Build fpicker
+RUN git clone https://github.com/michaelv123/fpicker /fpicker
+WORKDIR /fpicker
+RUN cp /frida/build/subprojects/frida-core/src/devkit/libfrida-core.a .
+RUN cp /frida/build/subprojects/frida-core/src/devkit/frida-core.h .
+RUN CC=arm-unknown-linux-gnueabi-gcc make fpicker-linux
+
+# Build afl-network-server
+RUN git clone https://github.com/AFLplusplus/AFLplusplus /AFLplusplus
+WORKDIR /AFLplusplus/utils/afl_network_proxy
+RUN CC=arm-unknown-linux-gnueabi-gcc make
